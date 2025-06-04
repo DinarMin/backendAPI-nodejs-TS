@@ -21,9 +21,7 @@ export class UserController {
                 res.status(200).json({ message: "User registered" });
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(401).json({ error: error.message });
-                }
+                res.status(400).json({ error: error.message });
             }
         });
         this.authorizationUser = (req, res) => __awaiter(this, void 0, void 0, function* () {

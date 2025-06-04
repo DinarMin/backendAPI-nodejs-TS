@@ -9,7 +9,7 @@ const userController = new UserController(userService);
 const router = express.Router();
 
 router.post('/registration', userController.registerUser);
-router.get('/authorization', userController.authorizationUser);
+router.post('/authorization', userController.authorizationUser);
 
 export default router;
 

@@ -59,7 +59,6 @@ export class TaskController {
                 res.status(200).json({ task: result });
             }
             catch (error) {
-                console.log(error);
                 res
                     .status(404)
                     .json({ error: "Произошла ошибка, повторите попытку еще раз." });

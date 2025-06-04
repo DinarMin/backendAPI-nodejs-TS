@@ -15,6 +15,9 @@ class UserRepository {
                 yield pool.query("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)", [name, email, hashedPassword, role || "user"]);
             }
             catch (err) {
+                if (err.code === "23505") {
+                    throw new Error("Не правильный логин или пароль!");
+                }
                 throw err;
             }
         });

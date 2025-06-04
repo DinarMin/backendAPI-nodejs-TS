@@ -63,7 +63,6 @@ export class TaskController {
       logger.info(`Статус задачи успешно обновлена. taskID: ${req.body.taskId}`);
       res.status(200).json({ task: result });
     } catch (error) {
-      console.log(error);
       res
         .status(404)
         .json({ error: "Произошла ошибка, повторите попытку еще раз." });

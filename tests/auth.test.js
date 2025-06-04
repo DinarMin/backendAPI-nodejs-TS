@@ -1,6 +1,6 @@
 import request from "supertest";
-import { app } from "../server/server.js";
-import pool from "../db/postgres.js";
+import { app } from "../dist/app/app.js";
+import pool from "../dist/db/postgres.js";
 import bcrypt from "bcryptjs";
 
 describe("Auth API", () => {
@@ -13,7 +13,7 @@ describe("Auth API", () => {
   });
 
   it("Регистрация нового пользователя", async () => {
-    const res = await request(app).post("/").send({
+    const res = await request(app).post("/user/registration").send({
       name: "JestTest",
       email: "TestJest@gmail.net",
       password: "123456",
@@ -23,16 +23,16 @@ describe("Auth API", () => {
   });
 
   it("Ошибка, такая почта уже существует", async () => {
-    await request(app).post("/").send({
+    await request(app).post("/user/registration").send({
       name: "JestTest",
       email: "TestJest@gmail.net",
       password: "123456",
     });
     const res = await request(app)
-      .post("/")
-      .send({ name: "TestJest", email: "TestJest@gmail.net", password: "12345" });
+      .post("/user/registration")
+      .send({ name: "TestJest", email: "TestJest@gmail.net", password: "123456" });
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe("Email already exists");
+    expect(res.body.error).toBe("Не правильный логин или пароль!");
   });
 
   it("Авторизация", async () => {
@@ -42,7 +42,7 @@ describe("Auth API", () => {
       ["test2", "test2@gmail.net", hashedPassword]
     );
     const res = await request(app)
-      .post("/")
+      .post("/user/authorization")
       .send({ email: "test2@gmail.net", password: "123456" });
     expect(res.statusCode).toBe(200);
     expect(res.body.token).toBeDefined();
@@ -50,9 +50,9 @@ describe("Auth API", () => {
 
   it("Ошибка, не правильный пароль", async () => {
     const res = await request(app)
-      .post("/")
+      .post("/user/authorization")
       .send({ email: "test2@gmail.net", password: "123456789" });
     expect(res.statusCode).toBe(401);
-    expect(res.body.error).toBe("Invalid credentials");
+    expect(res.body.error).toBe("Неверный логин или пароль!");
   });
 });

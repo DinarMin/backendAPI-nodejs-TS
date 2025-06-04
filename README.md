@@ -1,3 +1,5 @@
+# В РАЗРАБОТКЕ
+
 # Backend API
 
 REST API с авторизацией, задачами, магазином, погодой и калькулятором.
@@ -16,7 +18,7 @@ https://backend-api-nodejs-mdo2.onrender.com
 
 ## Setup
 ```bash
-git clone https://github.com/DuHaPuK/Backend-API-nodeJs.git  # Клонировать
+git clone https://github.com/DuHaPuK/ # Клонировать
 # Настроить .env
 npm run mon # Запустить
 ```

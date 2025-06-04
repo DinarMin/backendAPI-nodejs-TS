@@ -7,36 +7,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import userService from "../services/userService.js";
-const userController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = req.body;
-    if (name) {
-        const registerData = {
-            name,
-            email: req.body.email,
-            password: req.body.password,
-            role: req.body.role,
-        };
-        try {
-            yield userService.register(registerData);
-            res.status(200).json({ message: "User registered" });
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ error: error.message });
+export class UserController {
+    constructor(userService) {
+        this.registerUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const registerData = {
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: req.body.password,
+                    role: req.body.role,
+                };
+                yield this.userService.registerUser(registerData);
+                res.status(200).json({ message: "User registered" });
             }
-        }
-    }
-    else {
-        try {
-            const token = yield userService.login(req.body);
-            res.status(200).json({ token });
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                res.status(401).json({ error: error.message });
+            catch (error) {
+                if (error instanceof Error) {
+                    res.status(401).json({ error: error.message });
+                }
             }
-        }
+        });
+        this.authorizationUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = yield this.userService.authorizationUser(req.body);
+                res.status(200).json({ token });
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    res.status(401).json({ error: error.message });
+                }
+            }
+        });
+        this.userService = userService;
     }
-});
-export { userController };
+}

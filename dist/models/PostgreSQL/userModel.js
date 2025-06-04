@@ -8,23 +8,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import pool from "../../db/postgres.js";
-const create = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, email, hashedPassword, role }) {
-    try {
-        yield pool.query("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id", [name, email, hashedPassword, role || "user"]);
+class UserRepository {
+    createUser(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ name, email, hashedPassword, role, }) {
+            try {
+                yield pool.query("INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)", [name, email, hashedPassword, role || "user"]);
+            }
+            catch (err) {
+                throw err;
+            }
+        });
     }
-    catch (err) {
-        throw err;
+    checkUser(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield pool.query("SELECT * FROM users WHERE email = $1", [
+                    email,
+                ]);
+                const user = result.rows[0];
+                return user || null;
+            }
+            catch (err) {
+                throw err;
+            }
+        });
     }
-});
-const check = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield pool.query("SELECT * FROM users WHERE email = $1", [
-            email,
-        ]);
-        return result;
-    }
-    catch (err) {
-        throw err;
-    }
-});
-export default { create, check };
+}
+export default UserRepository;

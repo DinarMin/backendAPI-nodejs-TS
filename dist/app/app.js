@@ -18,8 +18,8 @@ import { validate, weatherSchema } from "../validations/validation.js";
 import logger from "../utils/logger.js";
 import checkPermissions from "../utils/rbac.js";
 import pool from "../db/postgres.js";
+import userRoutes from "../routes/userRoutes.js";
 import calculatorRoutes from "../routes/calculatorRoutes.js";
-import { userController } from "../controllers/userController.js";
 import taskNestRoutes from "../routes/taskRoutes.js";
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -38,7 +38,7 @@ app.use(helmet());
 app.use("/", limiter);
 dotenv.config();
 /* Обработка регистрации и авторизации */
-app.post("/auth", userController);
+app.use("/user", userRoutes);
 /* Роутер задач */
 app.use("/taskNest", taskNestRoutes);
 /* Роутер калькулятора */

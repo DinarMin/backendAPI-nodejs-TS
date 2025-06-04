@@ -44,7 +44,9 @@ class UserService {
       if (error) {
         throw new Error(`error: ${error.details[0].message}`);
       }
-      const user: CheckUserParams | null = await this.userModel.checkUser(email);
+      const user: CheckUserParams | null = await this.userModel.checkUser(
+        email
+      );
       if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new Error("Неверный логин или пароль!");
       }
@@ -62,6 +64,11 @@ class UserService {
       throw error;
     }
   }
+}
+
+export interface UserServiceInterface {
+  registerUser(userData: CreateUserRequest): Promise<void>;
+  authorizationUser(userData: AuthUserRequest): Promise<string>;
 }
 
 export default UserService;

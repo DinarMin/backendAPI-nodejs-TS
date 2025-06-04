@@ -9,66 +9,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 // import emailQueue from "../queues/emailQueue.js";
 import logger from "../utils/logger.js";
-import taskModel from "../models/PostgreSQL/taskModel.js";
-const createTask = (title, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield taskModel.createTask(title, userId);
-        // await emailQueue.add({
-        //   userId: userId,
-        //   message: `Task "${title}" created successfully`,
-        // });
-        logger.info(`Task created: ${title} by user ${userId}`);
-        return result;
+class TaskService {
+    constructor(taskModel) {
+        this.taskModel = taskModel;
     }
-    catch (err) {
-        console.log(err);
-        throw err;
+    createTask(title, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield this.taskModel.createTask(title, userId);
+                logger.info(`Task created: ${title} by user ${userId}`);
+                return result;
+            }
+            catch (err) {
+                console.log(err);
+                throw err;
+            }
+        });
     }
-});
-const getAllTask = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield taskModel.getAllTask(userId);
-    return result;
-});
-const updateStatus = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const { status, taskId } = req.body;
-    const result = yield taskModel.updateStatus(status, taskId, req.userId);
-    const task = result.rows;
-    if (task.length === 0) {
-        logger.warn(`Произошла ошибка, задача не найдена в базе данных! userID: ${req.userId}`);
-        return {
-            message: "Произошла ошибка, задача не найдена в базе данных!",
-        };
+    getAllTask(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.taskModel.getAllTask(userId);
+            return result;
+        });
     }
-    return task;
-});
-const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.userId) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
+    updateStatus(status, taskId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.taskModel.updateStatus(status, taskId, userId);
+            if (!result) {
+                logger.warn(`Произошла ошибка, задача не найдена в базе данных! userID: ${userId}`);
+                return {
+                    message: "Произошла ошибка, задача не найдена в базе данных!",
+                };
+            }
+            return result;
+        });
     }
-    const result = yield taskModel.deleteTask(req.body.id, req.userId);
-    if (!result.rows[0]) {
-        return {
-            message: "Произошла ошибка, задача не найдена в базе данных!",
-        };
+    deleteTask(taskId, userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!userId) {
+                throw new Error("Unauthorized");
+            }
+            const result = yield this.taskModel.deleteTask(taskId, userId);
+            if (!result) {
+                throw new Error("Произошла ошибка, задача не найдена в базе данных!");
+            }
+        });
     }
-});
-const getTasksPag = (userId, page, limit) => __awaiter(void 0, void 0, void 0, function* () {
-    const pageInt = parseInt(page);
-    const offset = (pageInt - 1) * limit;
-    const tasks = yield taskModel.getTasksPag(userId, limit, offset);
-    const total = yield taskModel.getTotalPag(userId);
-    return {
-        tasks,
-        total: parseInt(total),
-        page: pageInt,
-        pages: Math.ceil(total / limit),
-    };
-});
-export default {
-    createTask,
-    getAllTask,
-    updateStatus,
-    deleteTask,
-    getTasksPag,
-};
+    getTasksPag(userId, limit, page) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pageInt = parseInt(page);
+            const offset = (pageInt - 1) * limit;
+            const tasks = yield this.taskModel.getTasksPag(userId, limit, offset);
+            const total = yield this.taskModel.getTotalPag(userId);
+            return {
+                tasks,
+                total: total,
+                page: pageInt,
+                pages: Math.ceil(total / limit),
+            };
+        });
+    }
+}
+export default TaskService;

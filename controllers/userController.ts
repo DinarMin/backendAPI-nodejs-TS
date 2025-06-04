@@ -1,12 +1,5 @@
 import { Request, Response } from "express";
-import userService from "../services/userService.js";
-
-type UserRequest = {
-  name?: string;
-  email: string;
-  password: string;
-  role?: string;
-};
+import { UserServiceInterface } from "../services/userService.js";
 
 type CreateUserRequest = {
   name: string;
@@ -15,33 +8,38 @@ type CreateUserRequest = {
   role?: string;
 };
 
-const userController = async (req: Request<{}, {}, UserRequest>, res: Response) => {
-  const { name } = req.body;
-  if (name) {
-    const registerData: CreateUserRequest = {
-      name,
-      email: req.body.email,
-      password: req.body.password,
-      role: req.body.role,
-    };
+export class UserController {
+  private userService: UserServiceInterface;
+
+  constructor(userService: UserServiceInterface) {
+    this.userService = userService;
+  }
+
+  registerUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      await userService.register(registerData);
+      const registerData: CreateUserRequest = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        role: req.body.role,
+      };
+      await this.userService.registerUser(registerData);
       res.status(200).json({ message: "User registered" });
     } catch (error) {
       if (error instanceof Error) {
         res.status(401).json({ error: error.message });
       }
     }
-  } else {
+  };
+
+  authorizationUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const token = await userService.login(req.body);
+      const token: string = await this.userService.authorizationUser(req.body);
       res.status(200).json({ token });
     } catch (error) {
       if (error instanceof Error) {
         res.status(401).json({ error: error.message });
       }
     }
-  }
-};
-
-export { userController };
+  };
+}

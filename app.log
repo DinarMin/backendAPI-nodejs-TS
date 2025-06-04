@@ -626,3 +626,7 @@
 {"level":"info","message":"Task created: Test Task by user 6","timestamp":"2025-05-21T06:40:00.124Z"}
 {"level":"info","message":"Задача успешно добавлена! userid: 6 [object Object]","timestamp":"2025-05-21T06:40:00.128Z"}
 {"level":"info","message":"Запрос задач успешно прошла. user 6","timestamp":"2025-05-21T06:40:00.150Z"}
+{"level":"info","message":"Регистрация прошла успешно! email: NailtsestAPI2@gmail.com","timestamp":"2025-06-04T15:30:56.800Z"}
+{"level":"warn","message":"Ошибка валидации: [object Object]","timestamp":"2025-06-04T15:31:09.527Z"}
+{"level":"info","message":"Регистрация прошла успешно! email: dinar2202@gmail.com","timestamp":"2025-06-04T15:31:24.331Z"}
+{"level":"info","message":"Регистрация прошла успешно! email: dinar2202@gmail.com","timestamp":"2025-06-04T15:31:59.255Z"}

@@ -23,28 +23,50 @@ class TaskRepository {
     }
     getAllTask(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield pool.query("SELECT * FROM tasks WHERE user_id=$1", [
-                userId,
-            ]);
-            return result.rows;
+            try {
+                const result = yield pool.query("SELECT * FROM tasks WHERE user_id=$1", [
+                    userId,
+                ]);
+                return result.rows;
+            }
+            catch (err) {
+                console.error("Error in getAllTask:", err);
+                throw err;
+            }
         });
     }
     updateStatus(status, taskId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield pool.query("UPDATE tasks SET status=$1 WHERE id=$2 AND user_id=$3 RETURNING *", [status, taskId, userId]);
-            return result.rows[0];
+            try {
+                const result = yield pool.query("UPDATE tasks SET status=$1 WHERE id=$2 AND user_id=$3 RETURNING *", [status, taskId, userId]);
+                return result.rows[0];
+            }
+            catch (err) {
+                console.error("Error in updateStatus:", err);
+                throw err;
+            }
         });
     }
-    deleteTask(id, userId) {
+    deleteTask(taskId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield pool.query("DELETE FROM tasks WHERE id=$1 AND user_id=$2 RETURNING *", [id, userId]);
-            return result.rows[0];
+            try {
+                yield pool.query("DELETE FROM tasks WHERE id=$1 AND user_id=$2 RETURNING *", [taskId, userId]);
+            }
+            catch (err) {
+                console.error("Error in deleteTask:", err);
+                throw err;
+            }
         });
     }
     getTasksPag(userId, limit, offset) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield pool.query("SELECT * FROM tasks WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3", [userId, limit, offset]);
-            return res.rows;
+            try {
+                const res = yield pool.query("SELECT * FROM tasks WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3", [userId, limit, offset]);
+                return res.rows;
+            }
+            catch (err) {
+                throw err;
+            }
         });
     }
     getTotalPag(userId) {

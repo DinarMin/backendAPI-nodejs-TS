@@ -12,7 +12,7 @@ export class TaskController {
   createTask = async (req: Request, res: Response) => {
     try {
       const { title } = req.body;
-  
+
       if (!req.userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
@@ -31,7 +31,7 @@ export class TaskController {
         error: "Ошибка сервера. Не удалось создать задачу. Попробуйте снова.",
       });
     }
-  }
+  };
 
   getAllTask = async (req: Request, res: Response) => {
     try {
@@ -39,17 +39,16 @@ export class TaskController {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-  
+
       const result: { [key: string]: any } = await this.taskService.getAllTask(
         req.userId
       );
-      res.json(result.rows);
+      res.status(200).json(result);
     } catch (error) {
-      console.log(error);
       logger.warn(`Не удалось получить список задач! userid: ${req.userId}`);
       res.status(500).json({ error: "Не удалось получить список задач." });
     }
-  }
+  };
 
   updateStatus = async (req: Request, res: Response) => {
     try {
@@ -57,31 +56,37 @@ export class TaskController {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-      const { userId } = req.body.userId;
+      const userId = req.body.userId;
       const { status, taskId } = req.body;
-      const result = await this.taskService.updateStatus(userId, status, taskId);
-      logger.info(`Статус задачи успешно обновлена. taskID: ${req.body.taskId}`);
+      const result = await this.taskService.updateStatus(
+        status,
+        taskId,
+        userId
+      );
+      logger.info(
+        `Статус задачи успешно обновлена. taskID: ${req.body.taskId}`
+      );
       res.status(200).json({ task: result });
     } catch (error) {
       res
         .status(404)
         .json({ error: "Произошла ошибка, повторите попытку еще раз." });
     }
-  }
+  };
 
   deleteTask = async (req: Request, res: Response) => {
     try {
-      const taskId = req.body;
-      const userId  = req.body.userId;
+      const { taskId, userId } = req.body;
       await this.taskService.deleteTask(taskId, userId);
-      res.status(204)
+      res.sendStatus(204);
     } catch (error: any) {
       if (error.message === "Unauthorized") {
         res.status(401).json({ message: error });
       }
+      console.log(error);
       res.status(404).json({ message: error });
     }
-  }
+  };
 
   getTasksPag = async (req: Request, res: Response) => {
     try {
@@ -89,13 +94,13 @@ export class TaskController {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-  
+
       const rawPage = req.query.page;
       const rawLimit = req.query.limit;
-  
+
       const page = typeof rawPage === "string" ? parseInt(rawPage, 10) : 1;
       const limit = "10";
-  
+
       const userId = req.userId;
       const result = await this.taskService.getTasksPag(userId, page, limit);
       logger.info(`Запрос задач успешно прошла. user ${userId}`);
@@ -105,5 +110,5 @@ export class TaskController {
         res.status(400).json(error.message);
       }
     }
-  }
+  };
 }

@@ -38,10 +38,9 @@ export class TaskController {
                     return;
                 }
                 const result = yield this.taskService.getAllTask(req.userId);
-                res.json(result.rows);
+                res.status(200).json(result);
             }
             catch (error) {
-                console.log(error);
                 logger.warn(`Не удалось получить список задач! userid: ${req.userId}`);
                 res.status(500).json({ error: "Не удалось получить список задач." });
             }
@@ -52,9 +51,9 @@ export class TaskController {
                     res.status(401).json({ message: "Unauthorized" });
                     return;
                 }
-                const { userId } = req.body.userId;
+                const userId = req.body.userId;
                 const { status, taskId } = req.body;
-                const result = yield this.taskService.updateStatus(userId, status, taskId);
+                const result = yield this.taskService.updateStatus(status, taskId, userId);
                 logger.info(`Статус задачи успешно обновлена. taskID: ${req.body.taskId}`);
                 res.status(200).json({ task: result });
             }
@@ -66,15 +65,15 @@ export class TaskController {
         });
         this.deleteTask = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const taskId = req.body;
-                const userId = req.body.userId;
+                const { taskId, userId } = req.body;
                 yield this.taskService.deleteTask(taskId, userId);
-                res.status(204);
+                res.sendStatus(204);
             }
             catch (error) {
                 if (error.message === "Unauthorized") {
                     res.status(401).json({ message: error });
                 }
+                console.log(error);
                 res.status(404).json({ message: error });
             }
         });

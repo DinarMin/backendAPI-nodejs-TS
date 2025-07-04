@@ -28,7 +28,7 @@ describe("Tasks API", () => {
 
   it("Создание задачи", async () => {
     const res = await request(app)
-      .post("/taskNest")
+      .post("/taskNest/create")
       .set("Content-Type", "application/json")
       .set("Authorization", token)
       .send({ title: "Test Task" });
@@ -42,7 +42,9 @@ describe("Tasks API", () => {
       "Test Task",
       userId,
     ]);
-    const res = await request(app).get("/taskNest").set("Authorization", token);
+    const res = await request(app)
+      .get("/taskNest/all")
+      .set("Authorization", token);
     expect(res.statusCode).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
   });
@@ -53,11 +55,12 @@ describe("Tasks API", () => {
       ["Update task", userId]
     );
     const res = await request(app)
-      .put("/taskNest")
+      .put("/taskNest/update")
       .set("Authorization", token)
       .send({
-        taskId: task.rows[0].id,
         status: true,
+        taskId: task.rows[0].id,
+        userId,
       });
     expect(res.statusCode).toBe(200);
     expect(res.body).toBe(res.body);
@@ -69,12 +72,12 @@ describe("Tasks API", () => {
       ["Delete task", userId]
     );
     const res = await request(app)
-      .delete("/taskNest")
+      .delete("/taskNest/delete")
       .set("Authorization", token)
       .send({
         taskId: task.rows[0].id,
+        userId,
       });
     expect(res.statusCode).toBe(204);
-    expect(res.body).toEqual({});
   });
 });

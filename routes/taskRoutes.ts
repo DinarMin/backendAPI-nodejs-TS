@@ -10,9 +10,9 @@ const taskController = new TaskController(taskService);
 
 const router = express.Router();
 
-router.get("/all", Auth, taskController.getTasksPag);
+router.get("/all", Auth, taskController.getAllTask);
 router.post("/create", Auth, validate(taskSchema), taskController.createTask);
 router.put("/update", Auth, taskController.updateStatus);
-router.post("/delete", Auth, taskController.deleteTask);
+router.delete("/delete", Auth, taskController.deleteTask);
 
 export default router;

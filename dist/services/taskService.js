@@ -34,24 +34,29 @@ class TaskService {
     }
     updateStatus(status, taskId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.taskModel.updateStatus(status, taskId, userId);
-            if (!result) {
-                logger.warn(`Произошла ошибка, задача не найдена в базе данных! userID: ${userId}`);
-                return {
-                    message: "Произошла ошибка, задача не найдена в базе данных!",
-                };
+            try {
+                const result = yield this.taskModel.updateStatus(status, taskId, userId);
+                if (!result) {
+                    logger.warn(`Произошла ошибка, задача не найдена в базе данных! userID: ${userId}`);
+                    throw new Error("Произошла ошибка, задача не найдена в базе данных!");
+                }
+                return result;
             }
-            return result;
+            catch (error) {
+                throw error;
+            }
         });
     }
     deleteTask(taskId, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!userId) {
-                throw new Error("Unauthorized");
+            try {
+                if (!userId) {
+                    throw new Error("Unauthorized");
+                }
+                yield this.taskModel.deleteTask(taskId, userId);
             }
-            const result = yield this.taskModel.deleteTask(taskId, userId);
-            if (!result) {
-                throw new Error("Произошла ошибка, задача не найдена в базе данных!");
+            catch (error) {
+                throw error;
             }
         });
     }

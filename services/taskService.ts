@@ -33,26 +33,28 @@ class TaskService {
     taskId: string,
     userId: string
   ): Promise<Task | { message: string }> {
-    const result = await this.taskModel.updateStatus(status, taskId, userId);
-    if (!result) {
-      logger.warn(
-        `Произошла ошибка, задача не найдена в базе данных! userID: ${userId}`
-      );
-      return {
-        message: "Произошла ошибка, задача не найдена в базе данных!",
-      };
+    try {
+      const result = await this.taskModel.updateStatus(status, taskId, userId);
+      if (!result) {
+        logger.warn(
+          `Произошла ошибка, задача не найдена в базе данных! userID: ${userId}`
+        );
+        throw new Error("Произошла ошибка, задача не найдена в базе данных!");
+      }
+      return result;
+    } catch (error) {
+      throw error;
     }
-    return result;
   }
 
-  async deleteTask(taskId: string, userId: string) {
-    if (!userId) {
-      throw new Error("Unauthorized");
-    }
-    const result = await this.taskModel.deleteTask(taskId, userId);
-
-    if (!result) {
-      throw new Error("Произошла ошибка, задача не найдена в базе данных!");
+  async deleteTask(taskId: string, userId: string): Promise<void> {
+    try {
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+      await this.taskModel.deleteTask(taskId, userId);
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -73,7 +75,7 @@ class TaskService {
 export interface TaskServiceInterface {
   createTask(title: string, userId: string): Promise<Task>;
   getAllTask(userId: string): Promise<Task[]>;
-  updateStatus( status: boolean, userId: string, taskId: string): Promise<any>;
+  updateStatus(status: boolean, taskId: string, userId: string): Promise<any>;
   deleteTask(taskId: string, userId: string): Promise<void>;
   getTasksPag(userId: string, limit: number, page: string): Promise<any>;
 }

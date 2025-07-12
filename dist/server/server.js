@@ -10,7 +10,20 @@ const options = {
 https.createServer(options, app).listen(443, () => {
     console.log("Server on port 443 (HTTPS)");
 });
-http.createServer(app).listen(3000, () => {
-    console.log("Server on port 3000 (HTTP)");
+const port = Number(process.env.PORT || 3000);
+if (isNaN(port)) {
+    throw new Error("Порт должен быть числом!");
+}
+const server = http.createServer(app).listen(port, () => {
+    console.log(`Server on port ${port} (HTTP)`);
+});
+server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+        console.error(`Порт: ${port} уже занят!`);
+    }
+    else {
+        console.error("Неизвестная ошибка сервера:", err);
+    }
+    process.exit(1);
 });
 runMigrations();

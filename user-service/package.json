@@ -1,12 +1,13 @@
 {
-  "name": "learning-nodejs",
+  "name": "user-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "start": "node index.js",
-    "mon": "nodemon dist/server/server.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",

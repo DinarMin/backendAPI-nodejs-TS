@@ -1,5 +1,3 @@
-.env
-notes.md
-README.md
-app.log
-node_modules
+api-gateway/.env
+user-service/.env
+task-service/.env

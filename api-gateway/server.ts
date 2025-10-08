@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { Request, Response, NextFunction } from "express";
+import axios from "axios";
 // import { createProxyMiddleware } from "http-proxy-middleware";
 
 const limiter = rateLimit({
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(helmet());
 app.use("/", limiter);
 dotenv.config();
+app.use(express.json());
 
 const PORTApigateway: number = Number(process.env.PORTAPIGATEWAY || 3000);
 
@@ -36,7 +38,9 @@ const server = app.listen(PORTApigateway, () => {
 server.on("error", (err: Error) => {
   if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
     console.error(
-      `Порт: ${PORTApigateway} уже занят, используйте другой, например ${PORTApigateway + 5}`
+      `Порт: ${PORTApigateway} уже занят, используйте другой, например ${
+        PORTApigateway + 5
+      }`
     );
   } else {
     console.error("Неизвестная ошибка сервера:", err);
@@ -51,3 +55,21 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 const USER_SERVICE_URL: string = `http://localhost:${process.env.PORTUSERSERVICE}`;
 
+app.post("/registration", async (req, res) => {
+  try {
+    const response = await axios.post(
+      `${USER_SERVICE_URL}/user/registration`,
+      req.body,
+      {
+        validateStatus: (status) => status < 500,
+      }
+    );
+    res.status(response.status).json(response.data);
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || error.message,
+    });
+  }
+});

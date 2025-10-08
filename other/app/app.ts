@@ -7,7 +7,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 
 import { Auth } from "../utils/auth.js";
-import { validate, weatherSchema } from "../validations/validation.js";
+import { validate, weatherSchema } from "../../user-service/validations/validation.js";
 import logger from "../utils/logger.js";
 import checkPermissions from "../utils/rbac.js";
 import pool from "../user-service/db/postgres.js";

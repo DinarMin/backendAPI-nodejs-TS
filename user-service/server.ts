@@ -1,16 +1,20 @@
-import express from "express";
-import cors from "cors";
+import dotenv from "dotenv";
+import { app } from "./app/app.js";
+dotenv.config();
 
-import { Request, Response, NextFunction } from "express";
+const PORTUserService: number = Number(process.env.PORTUSERSERVICE || 3000 + 9);
 
-const app = express();
+const server = app.listen(PORTUserService, () => {
+  console.log(`Сервис User успешно запущен на порту ${PORTUserService}`);
+});
 
-app.use(
-  cors({
-    origin: ["http://localhost:3000"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
+server.on("error", (err: Error) => {
+  if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
+    console.error(
+      `Порт: ${PORTUserService} уже занят, используйте другой порт`
+    );
+  } else {
+    console.error("Неизвестная ошибка сервера:", err);
+  }
+  process.exit(1);
+});

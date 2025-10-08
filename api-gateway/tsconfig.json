@@ -3,9 +3,9 @@
     "target": "es2016",
     "esModuleInterop": true,
     "outDir": "dist",
-    "module": "esnext",
+    "module": "NodeNext",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true

@@ -1,10 +1,8 @@
-import { registerSchema, loginSchema } from "../../validations/validation.js";
+import { registerSchema, loginSchema } from "../validations/validation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import logger from "../../utils/logger.js";
-import UserRepository, {
-  CheckUserParams,
-} from "../models/userModel.js";
+import logger from "../utils/logger.js";
+import UserRepository, { CheckUserParams } from "../models/userModel.js";
 
 type CreateUserRequest = {
   name: string;
@@ -39,11 +37,11 @@ class UserService {
 
   async authorizationUser(userData: AuthUserRequest): Promise<string> {
     const { email, password } = userData;
+    const { error } = loginSchema.validate({ email, password });
+    if (error) {
+      throw new Error(`error: ${error.details[0].message}`);
+    }
     try {
-      const { error } = loginSchema.validate({ email, password });
-      if (error) {
-        throw new Error(`error: ${error.details[0].message}`);
-      }
       const user: CheckUserParams | null = await this.userModel.checkUser(
         email
       );

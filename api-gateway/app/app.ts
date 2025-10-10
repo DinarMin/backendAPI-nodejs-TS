@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
@@ -59,7 +59,9 @@ app.post("/authorization", async (req, res) => {
         validateStatus: (status) => status < 500,
       }
     );
+
     const token = response.data.token;
+
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "lax",
@@ -69,11 +71,9 @@ app.post("/authorization", async (req, res) => {
 
     res.status(response.status).json({ message: "Login successful" });
   } catch (error: any) {
-    res
-      .status(error.response?.status || 500)
-      .json({
-        success: false,
-        message: error.response?.data?.message || error.message,
-      });
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || error.message,
+    });
   }
 });

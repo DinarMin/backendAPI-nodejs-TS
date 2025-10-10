@@ -76,7 +76,8 @@ export class TaskController {
 
   deleteTask = async (req: Request, res: Response) => {
     try {
-      const { taskId, userId } = req.body;
+      const taskId = req.params.id;
+      const { userId } = req.body;
       await this.taskService.deleteTask(taskId, userId);
       res.sendStatus(204);
     } catch (error: any) {
@@ -101,7 +102,7 @@ export class TaskController {
       const page = typeof rawPage === "string" ? parseInt(rawPage, 10) : 1;
       const limit = "10";
 
-      const userId = req.userId;
+      const userId= req.userId;
       const result = await this.taskService.getTasksPag(userId, page, limit);
       logger.info(`Запрос задач успешно прошла. user ${userId}`);
       res.status(200).json(result);

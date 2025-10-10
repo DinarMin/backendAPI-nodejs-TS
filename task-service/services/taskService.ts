@@ -47,7 +47,7 @@ class TaskService {
     }
   }
 
-  async deleteTask(taskId: string, userId: string): Promise<void> {
+  async deleteTask(taskId: number, userId: string): Promise<void> {
     try {
       if (!userId) {
         throw new Error("Unauthorized");

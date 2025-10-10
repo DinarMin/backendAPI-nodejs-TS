@@ -39,7 +39,7 @@ dotenv.config();
 app.use("/user", userRoutes);
 
 /* Роутер задач */
-app.use("/taskNest", taskNestRoutes);
+app.use("/user/taskNest", taskNestRoutes);
 
 /* Роутер калькулятора */
 app.use("/api/calculate", calculatorRoutes as express.Router);

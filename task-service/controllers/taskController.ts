@@ -1,5 +1,5 @@
 import { TaskServiceInterface } from "../services/taskService.js";
-import logger from "../../utils/logger.js";
+import logger from "../utils/logger.js";
 import { Request, Response } from "express";
 
 export class TaskController {

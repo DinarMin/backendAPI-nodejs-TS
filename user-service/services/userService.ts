@@ -1,4 +1,3 @@
-import { registerSchema, loginSchema } from "../validations/validation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
@@ -22,11 +21,6 @@ class UserService {
   async registerUser(userData: CreateUserRequest): Promise<void> {
     const { name, email, password, role } = userData;
     try {
-      const { error } = registerSchema.validate({ name, email, password });
-      if (error) {
-        logger.warn(`Ошибка валидации: ${error.details}`);
-        throw new Error(`error: ${error.details[0].message}`);
-      }
       const hashedPassword = await bcrypt.hash(password, 10);
       await this.userModel.createUser({ name, email, hashedPassword, role });
       logger.info(`Регистрация прошла успешно! email: ${email}`);
@@ -34,13 +28,9 @@ class UserService {
       throw error;
     }
   }
-
+  
   async authorizationUser(userData: AuthUserRequest): Promise<string> {
     const { email, password } = userData;
-    const { error } = loginSchema.validate({ email, password });
-    if (error) {
-      throw new Error(`error: ${error.details[0].message}`);
-    }
     try {
       const user: CheckUserParams | null = await this.userModel.checkUser(
         email

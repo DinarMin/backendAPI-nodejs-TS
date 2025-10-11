@@ -1,5 +1,5 @@
 // import emailQueue from "../queues/emailQueue.js";
-import logger from "../../utils/logger.js";
+import logger from "../utils/logger.js";
 import TaskRepository, { Task } from "../models/taskModel.js";
 
 type TasksPag = {

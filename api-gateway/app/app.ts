@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from "express";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 100,
   handler: (req, res) => {
     res.status(429).json({
       success: false,
@@ -31,7 +31,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 const USER_SERVICE_URL: string = `http://localhost:${process.env.PORTUSERSERVICE}`;
 
-app.post("users/registration", async (req, res) => {
+app.post("/users/registration", async (req, res) => {
   try {
     const response = await axios.post(
       `${USER_SERVICE_URL}/users/registration`,
@@ -50,7 +50,7 @@ app.post("users/registration", async (req, res) => {
   }
 });
 
-app.post("users/authorization", async (req, res) => {
+app.post("/users/authorization", async (req, res) => {
   try {
     const response = await axios.post(
       `${USER_SERVICE_URL}/users/authorization`,
@@ -60,7 +60,7 @@ app.post("users/authorization", async (req, res) => {
       }
     );
 
-    const token = response.data.token;
+    const token = await response.data.token;
 
     res.cookie("token", token, {
       httpOnly: true,

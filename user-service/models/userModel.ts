@@ -1,3 +1,4 @@
+import { BlobOptions } from "buffer";
 import pool from "../db/postgres.js";
 
 type CreateUserParams = {
@@ -11,7 +12,7 @@ export type CheckUserParams = {
   id: string;
   email: string;
   password: string;
-}
+};
 
 class UserRepository {
   async createUser({
@@ -27,7 +28,7 @@ class UserRepository {
       );
     } catch (err: any) {
       if (err.code === "23505") {
-        throw new Error("Не правильный логин или пароль!");
+        throw new Error("У вас какая то ошибка, попробуйте еще раз!");
       }
       throw err;
     }
@@ -35,9 +36,10 @@ class UserRepository {
 
   async checkUser(email: string): Promise<CheckUserParams | null> {
     try {
-      const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-        email,
-      ]);
+      const result = await pool.query(
+        "SELECT * FROM users WHERE email = $1",
+        [email]
+      );
       const user = result.rows[0];
       return user || null;
     } catch (err) {

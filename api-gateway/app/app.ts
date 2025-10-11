@@ -68,12 +68,35 @@ app.post("/users/authorization", async (req, res) => {
       secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    if (response.status === 200) {
+      return res
+        .status(response.status)
+        .json({ message: "Вы успешно авторизовались" });
+    }
 
-    res.status(response.status).json({ message: "Login successful" });
+    return res.status(response.status).json({ message: response.data });
   } catch (error: any) {
-    res.status(error.response?.status || 500).json({
-      success: false,
-      message: error.response?.data?.message || error.message,
-    });
+    if (error.response) {
+      if (error.response.status === 503) {
+        return res.status(503).json({
+          success: false,
+          message: "Сервис недоступен. Попробуйте позже",
+        });
+      }
+      return res.status(error.response.status).json({
+        success: false,
+        message: error.response.data?.message || error.message,
+      });
+    } else if (error.request) {
+      return res.status(503).json({
+        success: false,
+        message: "Сервер не отвечает. Попробуйте позже",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
   }
 });

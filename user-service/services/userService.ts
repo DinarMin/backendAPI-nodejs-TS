@@ -28,13 +28,14 @@ class UserService {
       throw error;
     }
   }
-  
+
   async authorizationUser(userData: AuthUserRequest): Promise<string> {
     const { email, password } = userData;
     try {
       const user: CheckUserParams | null = await this.userModel.checkUser(
         email
       );
+      
       if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new Error("Неверный логин или пароль!");
       }

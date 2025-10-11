@@ -31,10 +31,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 const USER_SERVICE_URL: string = `http://localhost:${process.env.PORTUSERSERVICE}`;
 
-app.post("/registration", async (req, res) => {
+app.post("users/registration", async (req, res) => {
   try {
     const response = await axios.post(
-      `${USER_SERVICE_URL}/user/registration`,
+      `${USER_SERVICE_URL}/users/registration`,
       req.body,
       {
         validateStatus: (status) => status < 500,
@@ -50,10 +50,10 @@ app.post("/registration", async (req, res) => {
   }
 });
 
-app.post("/authorization", async (req, res) => {
+app.post("users/authorization", async (req, res) => {
   try {
     const response = await axios.post(
-      `${USER_SERVICE_URL}/user/authorization`,
+      `${USER_SERVICE_URL}/users/authorization`,
       req.body,
       {
         validateStatus: (status) => status < 500,

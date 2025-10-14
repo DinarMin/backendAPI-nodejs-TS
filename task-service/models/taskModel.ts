@@ -50,7 +50,7 @@ class TaskRepository {
     }
   }
 
-  async deleteTask(taskId: number, userId: string): Promise<void> {
+  async deleteTask(taskId: string, userId: string): Promise<void> {
     try {
       await pool.query(
         "DELETE FROM tasks WHERE id=$1 AND user_id=$2 RETURNING *",

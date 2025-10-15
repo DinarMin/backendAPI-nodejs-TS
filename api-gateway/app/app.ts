@@ -78,12 +78,13 @@ app.use(async (req, res) => {
           secure: false,
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
+        return res.status(response.status).json(response.data.message);
       }
     }
     if (response.status !== 200) {
       throw new Error();
     }
-    res.status(response.status).json({ message: "Вы успешно авторизовались" });
+    return res.status(response.status).json(response.data);
   } catch (error: any) {
     console.error(error);
     res.status(error.response.status).json(error.response.data);

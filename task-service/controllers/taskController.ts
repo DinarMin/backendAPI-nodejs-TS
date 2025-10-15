@@ -1,11 +1,6 @@
 import { TaskServiceInterface } from "../services/taskService.js";
 import logger from "../utils/logger.js";
 import { Request, Response } from "express";
-
-interface AuthenticatedRequest extends Request {
-  userId?: string;
-}
-
 class TaskController {
   private taskService: TaskServiceInterface;
 
@@ -13,11 +8,10 @@ class TaskController {
     this.taskService = taskService;
   }
 
-  createTask = async (req: AuthenticatedRequest, res: Response) => {
+  createTask = async (req: Request, res: Response) => {
+    const userId = req.userId;
+    const { title } = req.body;
     try {
-      const { title } = req.body;
-      const userId = req.userId;
-      console.log(userId);
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
@@ -37,32 +31,32 @@ class TaskController {
   };
 
   getAllTask = async (req: Request, res: Response) => {
+    const userId = req.userId;
     try {
-      if (!req.body.userId) {
+      if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
 
       const result: { [key: string]: any } = await this.taskService.getAllTask(
-        req.body.userId
+        userId
       );
       res.status(200).json(result);
     } catch (error) {
-      logger.warn(
-        `Не удалось получить список задач! userid: ${req.body.userId}`
-      );
+      logger.warn(`Не удалось получить список задач! userid: ${userId}`);
       res.status(500).json({ error: "Не удалось получить список задач." });
     }
   };
 
   updateStatus = async (req: Request, res: Response) => {
+    const userId = req.userId;
     try {
-      if (!req.body.userId) {
+      if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-      const userId = req.body.userId;
-      const { status, taskId } = req.body;
+      const taskId = req.params.id;
+      const { status } = req.body;
       const result = await this.taskService.updateStatus(
         status,
         taskId,
@@ -80,9 +74,9 @@ class TaskController {
   };
 
   deleteTask = async (req: Request, res: Response) => {
+    const taskId = req.params.id;
+    const userId = req.userId;
     try {
-      const taskId = req.params.id;
-      const { userId } = req.body;
       await this.taskService.deleteTask(taskId, userId);
       res.sendStatus(204);
     } catch (error: any) {

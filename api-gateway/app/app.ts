@@ -6,6 +6,8 @@ import cors from "cors";
 import axios from "axios";
 import { Request, Response, NextFunction } from "express";
 import { routes } from "../routes/routes.js";
+import cookieParser from "cookie-parser";
+import cookie from "cookie";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -29,8 +31,22 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Необработанная ошибка:", err);
   res.status(500).json({ error: err.message });
 });
+app.use(cookieParser());
 
 app.use(async (req, res) => {
+  const tokenRequest = req.cookies?.token;
+
+  const headers = { ...req.headers };
+  if (tokenRequest) headers.authorization = tokenRequest;
+
+  const {
+    host,
+    connection,
+    cookie,
+    "content-length": _,
+    ...safeHeaders
+  } = headers;
+
   try {
     const baseUrl = Object.entries(routes).find(([prefix]) =>
       req.path.startsWith(prefix)
@@ -41,20 +57,22 @@ app.use(async (req, res) => {
     }
 
     const targetUrl = `${baseUrl}${req.originalUrl}`;
+    console.log(targetUrl);
 
     const response = await axios({
       method: req.method,
       url: targetUrl,
       data: req.body,
+      headers: safeHeaders,
       timeout: 3000,
       validateStatus: (status) => status === 200,
     });
 
     if (response.data.token) {
-      const token = await response.data.token;
+      const tokenResponse = await response.data.token;
 
-      if (token) {
-        res.cookie("token", token, {
+      if (tokenResponse) {
+        res.cookie("token", tokenResponse, {
           httpOnly: true,
           sameSite: "lax",
           secure: false,
@@ -63,7 +81,7 @@ app.use(async (req, res) => {
       }
     }
     if (response.status !== 200) {
-      throw new Error;
+      throw new Error();
     }
     res.status(response.status).json({ message: "Вы успешно авторизовались" });
   } catch (error: any) {

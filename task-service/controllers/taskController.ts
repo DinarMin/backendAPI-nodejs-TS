@@ -2,6 +2,10 @@ import { TaskServiceInterface } from "../services/taskService.js";
 import logger from "../utils/logger.js";
 import { Request, Response } from "express";
 
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
 class TaskController {
   private taskService: TaskServiceInterface;
 
@@ -9,23 +13,22 @@ class TaskController {
     this.taskService = taskService;
   }
 
-  createTask = async (req: Request, res: Response) => {
+  createTask = async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { title } = req.body;
-
-      if (!req.body.userId) {
+      const userId = req.userId;
+      console.log(userId);
+      if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-      const result = await this.taskService.createTask(title, req.body.userId);
-      logger.info(`Задача успешно добавлена! userid: ${req.body.userId} ${result}`);
+      const result = await this.taskService.createTask(title, userId);
+      logger.info(`Задача успешно добавлена! userid: ${userId} ${result}`);
       res.status(201).json({ message: "Задача успешно добавлена", result });
     } catch (err: unknown) {
       console.error("Ошибка при создании задачи:", err);
       if (err instanceof Error) {
-        logger.warn(
-          `Не удалось создать задачу. userId: ${req.body.userId}, ${err.message}`
-        );
+        logger.warn(`Не удалось создать задачу. userId: ${err.message}`);
       }
       res.status(500).json({
         error: "Ошибка сервера. Не удалось создать задачу. Попробуйте снова.",
@@ -45,7 +48,9 @@ class TaskController {
       );
       res.status(200).json(result);
     } catch (error) {
-      logger.warn(`Не удалось получить список задач! userid: ${req.body.userId}`);
+      logger.warn(
+        `Не удалось получить список задач! userid: ${req.body.userId}`
+      );
       res.status(500).json({ error: "Не удалось получить список задач." });
     }
   };
@@ -102,7 +107,7 @@ class TaskController {
       const page = typeof rawPage === "string" ? parseInt(rawPage, 10) : 1;
       const limit = "10";
 
-      const userId= req.body.userId;
+      const userId = req.body.userId;
       const result = await this.taskService.getTasksPag(userId, page, limit);
       logger.info(`Запрос задач успешно прошла. user ${userId}`);
       res.status(200).json(result);

@@ -1,4 +1,4 @@
-import pool from "../../user-service/db/postgres.js";
+import pool from "../db/postgres.js";
 
 export type Task = {
   id: string;

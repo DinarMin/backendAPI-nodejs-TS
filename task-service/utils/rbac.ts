@@ -1,7 +1,7 @@
 import logger from "./logger.js";
 import { Request, Response, NextFunction } from "express";
 // import User from "../models/Mongo/User.js";
-import pool from "../user-service/db/postgres.js";
+import pool from "../db/postgres.js";
 
 type Permission = "users:read" | "tasks:manage" | "tasks:create" | "tasks:read";
 

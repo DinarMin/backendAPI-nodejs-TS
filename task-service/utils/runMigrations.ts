@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import pool from "../user-service/db/postgres.js";
+import pool from "../db/postgres.js";
 
 export const runMigrations = async (): Promise<void> => {
   const migrationFiles: Array<string> = fs.readdirSync("./migrations").sort();

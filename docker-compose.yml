@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dinar2202
+      POSTGRES_DB: mydb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    env_file: /user-service/.env
+    depends_on:
+      - db
+    ports:
+      - "3001:3001"
+
+  task-service:
+    build: ./task-service
+    container_name: task-service
+    env_file: /task-service/.env
+    depends_on:
+      - db
+    ports:
+      - "3002:3002"
+  
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    env_file: /api-gateway/.env
+    depends_on:
+      - user-service
+      - task-service
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data:

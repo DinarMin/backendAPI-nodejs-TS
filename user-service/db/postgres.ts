@@ -13,6 +13,7 @@ pool.on("connect", () => {
 
 pool.on("error", () => {
   console.log("Ошибка подключение к базам PostgreSQL");
+  throw Error;
 });
 
 export default pool; 

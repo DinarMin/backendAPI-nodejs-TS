@@ -11,7 +11,7 @@ import cookie from "cookie";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   handler: (req, res) => {
     res.status(429).json({
       success: false,
@@ -57,7 +57,6 @@ app.use(async (req, res) => {
     }
 
     const targetUrl = `${baseUrl}${req.originalUrl}`;
-    console.log(targetUrl);
 
     const response = await axios({
       method: req.method,
@@ -69,7 +68,7 @@ app.use(async (req, res) => {
     });
 
     if (response.data.token) {
-      const tokenResponse = await response.data.token;
+      const tokenResponse = response.data.token;
 
       if (tokenResponse) {
         res.cookie("token", tokenResponse, {
@@ -81,12 +80,16 @@ app.use(async (req, res) => {
         return res.status(response.status).json(response.data.message);
       }
     }
-    if (response.status !== 200) {
+    if (![200, 201].includes(response.status)) {
       throw new Error();
     }
     return res.status(response.status).json(response.data);
   } catch (error: any) {
-    console.error(error);
-    res.status(error.response.status).json(error.response.data);
+    const status = error.response?.status || 500;
+    const data = error.response?.data || {
+      message: error.message || "Internal server error",
+    };
+    console.error(`${status}: ${data}, ${error}`);
+    return res.status(status).json(data);
   }
 });

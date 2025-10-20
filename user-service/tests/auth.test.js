@@ -13,7 +13,7 @@ describe("Auth API", () => {
   });
 
   it("Регистрация нового пользователя", async () => {
-    const res = await request(app).post("/user/registration").send({
+    const res = await request(app).post("/users/registration").send({
       name: "JestTest",
       email: "TestJest@gmail.net",
       password: "123456",
@@ -23,15 +23,18 @@ describe("Auth API", () => {
   });
 
   it("Ошибка, такая почта уже существует", async () => {
-    await request(app).post("/user/registration").send({
+    await request(app).post("/users/registration").send({
       name: "JestTest",
       email: "TestJest@gmail.net",
       password: "123456",
     });
-    const res = await request(app)
-      .post("/user/registration")
-      .send({ name: "TestJest", email: "TestJest@gmail.net", password: "123456" });
-    expect(res.statusCode).toBe(400);
+    const res = await request(app).post("/users/registration").send({
+      name: "JestTest",
+      email: "TestJest@gmail.net",
+      password: "123456",
+    });
+    expect(res.statusCode).toBe(401);
+    console.log(res.body);
     expect(res.body.error).toBe("Не правильный логин или пароль!");
   });
 
@@ -42,7 +45,7 @@ describe("Auth API", () => {
       ["test2", "test2@gmail.net", hashedPassword]
     );
     const res = await request(app)
-      .post("/user/authorization")
+      .post("/users/authorization")
       .send({ email: "test2@gmail.net", password: "123456" });
     expect(res.statusCode).toBe(200);
     expect(res.body.token).toBeDefined();
@@ -50,7 +53,7 @@ describe("Auth API", () => {
 
   it("Ошибка, не правильный пароль", async () => {
     const res = await request(app)
-      .post("/user/authorization")
+      .post("/users/authorization")
       .send({ email: "test2@gmail.net", password: "123456789" });
     expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe("Неверный логин или пароль!");

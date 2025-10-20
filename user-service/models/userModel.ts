@@ -28,7 +28,7 @@ class UserRepository {
       );
     } catch (err: any) {
       if (err.code === "23505") {
-        throw new Error("У вас какая то ошибка, попробуйте еще раз!");
+        throw new Error("Не правильный логин или пароль!");
       }
       throw err;
     }

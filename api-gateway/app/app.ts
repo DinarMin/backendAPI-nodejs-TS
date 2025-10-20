@@ -87,7 +87,7 @@ app.use(async (req, res) => {
   } catch (error: any) {
     const status = error.response?.status || 500;
     const data = error.response?.data || {
-      message: error.message || "Internal server error",
+      error: error.message || "Internal server error",
     };
     console.error(`${status}: ${data}, ${error}`);
     return res.status(status).json(data);

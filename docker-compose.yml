@@ -4,7 +4,7 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: dinar2202
+      POSTGRES_PASSWORD: postgress
       POSTGRES_DB: mydb
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -13,6 +13,7 @@ services:
       - "5432:5432"
 
   user-service:
+    image: dinar2202/user-service:latest
     build: ./user-service
     container_name: user-service
     env_file: /user-service/.env
@@ -22,6 +23,7 @@ services:
       - "3001:3001"
 
   task-service:
+    image: dinar2202/task-service:latest
     build: ./task-service
     container_name: task-service
     env_file: /task-service/.env
@@ -31,6 +33,7 @@ services:
       - "3002:3002"
   
   api-gateway:
+    image: dinar2202/api-gateway:latest
     build: ./api-gateway
     container_name: api-gateway
     env_file: /api-gateway/.env

@@ -1,5 +1,3 @@
-# 🚨 В РАЗРАБОТКЕ 
-
 # Backend API
 
 REST API с авторизацией и задачами. 
@@ -11,6 +9,7 @@ REST API с авторизацией и задачами.
 
 ## Setup
 ```bash
-git clone https://github.com/DinarMin/ # Клонировать
-# docker compose up --build
+git clone https://github.com/DinarMin/backendAPI-nodejs-TS.git # Клонировать
+https://www.docker.com/products/docker-desktop/ # Скачать docker (win/mac)
+docker compose up --build # запустить команду в дериктории 
 ```

@@ -12,6 +12,5 @@ REST API с авторизацией и задачами.
 ## Setup
 ```bash
 git clone https://github.com/DinarMin/ # Клонировать
-# Настроить .env
-npm run mon # Запустить
+# docker compose up --build
 ```

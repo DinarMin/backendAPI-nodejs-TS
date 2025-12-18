@@ -1,14 +1,20 @@
 import express from "express";
 import { UserController } from "../controllers/userController.js";
 import UserService from "../services/userService.js";
-import UserRepository from "../models/userModel.js";
 import {
   validate,
   registerSchema,
   loginSchema,
 } from "../validations/validation.js";
+import { UserRepository } from "../models/userModel.js";
+import { JwtService, BcryptService } from "../services/authService.js";
 
-const userService = new UserService(new UserRepository());
+const userRepository = new UserRepository();
+const encryptionService = new BcryptService();
+const tokenService = new JwtService();
+
+
+const userService = new UserService(userRepository, encryptionService, tokenService);
 const userController = new UserController(userService);
 
 const router = express.Router();

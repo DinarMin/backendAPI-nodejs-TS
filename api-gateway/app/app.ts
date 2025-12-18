@@ -7,7 +7,6 @@ import axios from "axios";
 import { Request, Response, NextFunction } from "express";
 import { routes } from "../routes/routes.js";
 import cookieParser from "cookie-parser";
-import cookie from "cookie";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

@@ -2,13 +2,6 @@
 import logger from "../utils/logger.js";
 import TaskRepository, { Task } from "../models/taskModel.js";
 
-type TasksPag = {
-  tasks: Task[];
-  total: number;
-  page: number;
-  pages: number;
-};
-
 class TaskService {
   constructor(private readonly taskModel: TaskRepository) {}
 
@@ -32,7 +25,7 @@ class TaskService {
     status: boolean,
     taskId: string,
     userId: string
-  ): Promise<Task | { message: string }> {
+  ): Promise<any | { message: string }> {
     try {
       const result = await this.taskModel.updateStatus(status, taskId, userId);
       if (!result) {
@@ -58,26 +51,13 @@ class TaskService {
     }
   }
 
-  async getTasksPag(userId: string, limit: number, page: string) {
-    const pageInt = parseInt(page);
-    const offset = (pageInt - 1) * limit;
-    const tasks = await this.taskModel.getTasksPag(userId, limit, offset);
-    const total = await this.taskModel.getTotalPag(userId);
-    return {
-      tasks,
-      total: total,
-      page: pageInt,
-      pages: Math.ceil(total / limit),
-    };
-  }
 }
 
 export interface TaskServiceInterface {
-  createTask(title: string, userId: string): Promise<Task>;
+  createTask(title: string, userId: string): Promise<any>;
   getAllTask(userId: string): Promise<Task[]>;
   updateStatus(status: boolean, taskId: string, userId: string): Promise<any>;
   deleteTask(taskId: string, userId: string): Promise<void>;
-  getTasksPag(userId: string, limit: number, page: string): Promise<any>;
 }
 
 export default TaskService;

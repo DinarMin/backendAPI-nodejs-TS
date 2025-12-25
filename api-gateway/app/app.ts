@@ -7,6 +7,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { IncomingMessage, ServerResponse } from "http";
 import { routes } from "../routes/routes.js";
+import { responseHandlerCookie } from "../helpers/responseHandlerCookie.js";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -28,7 +29,6 @@ app.use(cookieParser());
 app.use(limiter);
 
 Object.entries(routes).forEach(([route, target]: [string, string]) => {
-  console.log(route, target);
   const proxyOptions = {
     target,
     changeOrigin: true,
@@ -39,23 +39,17 @@ Object.entries(routes).forEach(([route, target]: [string, string]) => {
     on: {
       proxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) => {
         let chunks: Buffer[] = [];
-        proxyRes.on("data", (chunk: Buffer) => {
-          chunks.push(chunk);
-        });
+        proxyRes.on("data", (chunk: Buffer) => chunks.push(chunk));
         proxyRes.on("end", () => {
           const rawBody: string = Buffer.concat(chunks).toString();
           try {
             const parseBody = JSON.parse(rawBody);
-            if (parseBody.token) {
-              res.cookie("token", parseBody.token, {
-                httpOnly: true,
-                sameSite: "lax",
-                secure: false,
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-              });
-              res.end(parseBody.message);
+            const finalData = responseHandlerCookie(res, parseBody);
+            if (typeof finalData === "string") {
+              res.end(finalData);
+            } else {
+              res.json(finalData);
             }
-            res.end(parseBody);
           } catch (error) {
             res.status(proxyRes.statusCode || 500).end(rawBody);
           }
@@ -71,8 +65,3 @@ Object.entries(routes).forEach(([route, target]: [string, string]) => {
 });
 
 app.use(express.json());
-
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Необработанная ошибка:", err);
-  res.status(500).json({ error: err.message });
-});

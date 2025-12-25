@@ -11,7 +11,7 @@ export const Auth = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.headers["authorization"];
+  const token = req.headers["authorization"]?.match(/^Bearer\s+(.+)$/)?.[1];
   if (!token) {
     res.status(401).json({ error: "Error Token" });
     return;

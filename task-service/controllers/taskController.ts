@@ -63,7 +63,7 @@ class TaskController {
         userId
       );
       logger.info(
-        `Статус задачи успешно обновлена. taskID: ${req.body.taskId}`
+        `Статус задачи успешно обновлена. taskID: ${taskId}`
       );
       res.status(200).json({ task: result });
     } catch (error) {
@@ -88,29 +88,6 @@ class TaskController {
     }
   };
 
-  getTasksPag = async (req: Request, res: Response) => {
-    try {
-      if (!req.body.userId) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-
-      const rawPage = req.query.page;
-      const rawLimit = req.query.limit;
-
-      const page = typeof rawPage === "string" ? parseInt(rawPage, 10) : 1;
-      const limit = "10";
-
-      const userId = req.body.userId;
-      const result = await this.taskService.getTasksPag(userId, page, limit);
-      logger.info(`Запрос задач успешно прошла. user ${userId}`);
-      res.status(200).json(result);
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json(error.message);
-      }
-    }
-  };
 }
 
 export default TaskController;

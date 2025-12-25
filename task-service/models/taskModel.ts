@@ -1,4 +1,4 @@
-import pool from "../db/postgres.js";
+import { prisma } from "../db/prisma.js";
 
 export type Task = {
   id: string;
@@ -8,25 +8,32 @@ export type Task = {
 };
 
 class TaskRepository {
-  async createTask(title: string, userId: string): Promise<Task> {
+  async createTask(title: string, userId: string): Promise<void> {
     try {
-      const result = await pool.query(
-        "INSERT INTO tasks (title, user_id) VALUES ($1, $2) RETURNING *",
-        [title, userId]
-      );
-      return result.rows[0];
+      await prisma.tasks.create({
+        data: {
+          title: title,
+          userId: String(userId)
+        },
+      });
+      await prisma.$disconnect();
+      return;
     } catch (err) {
       console.error("Error in createTask:", err);
+      await prisma.$disconnect();
       throw err;
     }
   }
 
-  async getAllTask(userId: string): Promise<Task[]> {
+  async getAllTask(userId: string): Promise<any> {
     try {
-      const result = await pool.query("SELECT * FROM tasks WHERE user_id=$1", [
-        userId,
-      ]);
-      return result.rows;
+      const result = await prisma.tasks.findMany({
+        where: {
+          userId,
+        },
+      });
+      await prisma.$disconnect();
+      return result;
     } catch (err) {
       console.error("Error in getAllTask:", err);
       throw err;
@@ -37,13 +44,17 @@ class TaskRepository {
     status: boolean,
     taskId: string,
     userId: string
-  ): Promise<Task> {
+  ): Promise<any> {
     try {
-      const result = await pool.query(
-        "UPDATE tasks SET status=$1 WHERE id=$2 AND user_id=$3 RETURNING *",
-        [status, taskId, userId]
-      );
-      return result.rows[0];
+      const result = await prisma.tasks.update({
+        where: {
+          id: Number(taskId),
+          userId,
+        },
+        data: { status },
+      });
+      await prisma.$disconnect();
+      return result;
     } catch (err) {
       console.error("Error in updateStatus:", err);
       throw err;
@@ -52,38 +63,17 @@ class TaskRepository {
 
   async deleteTask(taskId: string, userId: string): Promise<void> {
     try {
-      await pool.query(
-        "DELETE FROM tasks WHERE id=$1 AND user_id=$2 RETURNING *",
-        [taskId, userId]
-      );
+      await prisma.tasks.delete({
+        where: {
+          id: Number(taskId),
+          userId,
+        },
+      });
+      await prisma.$disconnect();
     } catch (err) {
       console.error("Error in deleteTask:", err);
       throw err;
     }
-  }
-
-  async getTasksPag(
-    userId: string,
-    limit: number,
-    offset: number
-  ): Promise<Task[]> {
-    try {
-      const res = await pool.query(
-        "SELECT * FROM tasks WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3",
-        [userId, limit, offset]
-      );
-      return res.rows;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async getTotalPag(userId: string): Promise<number> {
-    const res = await pool.query(
-      "SELECT COUNT(*) FROM tasks WHERE user_id = $1",
-      [userId]
-    );
-    return res.rows[0].count;
   }
 }
 

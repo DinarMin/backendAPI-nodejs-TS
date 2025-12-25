@@ -28,6 +28,7 @@ export class UserRepository {
           password: hashedPassword,
         },
       });
+      await prisma.$disconnect()
     } catch (err: any) {
       throw err;
     }
@@ -40,6 +41,7 @@ export class UserRepository {
           email: email,
         },
       });
+      await prisma.$disconnect()
       return result;
     } catch (err) {
       throw err;
